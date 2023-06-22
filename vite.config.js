@@ -11,7 +11,7 @@ export default defineConfig({
 		proxy: {
 			"/api": {
 				// target: "http://172.16.10.3:8080/api/v1/", //测试环境地址
-				target: "https://www.filpay.info/api/v1/", //实际请求地址
+				target: "https://www.filpay.info/api/", //实际请求地址
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, ""),
 			},
