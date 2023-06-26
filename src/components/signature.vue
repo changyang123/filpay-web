@@ -1,7 +1,7 @@
 <template>
 	<el-dialog :title="dialogName" v-model="dialogVisible" width="600px" @close="colse">
 		<div class="dialogInfo" v-loading="loading">
-			<div>
+			<div class="marb_10">
 				<div class="modify">
 					<p>{{ props.dialogName == "修改质押人地址" ? "现质押人地址" : props.dialogName == "修改收益人地址" ? "现收益人地址" : "钱包地址" }}</p>
 					<el-input v-model="addr" placeholder="请输入钱包地址" onkeyup="value=value.replace(/\s+/g, '')" style="width: 400px"> </el-input>
@@ -446,6 +446,9 @@ const chooseCurrency = (i) => {
 <style scoped>
 .mar_30 {
 	margin-top: 30px;
+}
+.marb_10 {
+	margin-bottom: 10px;
 }
 .line {
 	border-top: 2px solid #c9c7c7;

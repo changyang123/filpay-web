@@ -125,6 +125,27 @@ const proposalsFun = async () => {
 	try {
 		const res = await get(`${sessionStorage.getItem("network")}/${Route.query.id}/proposals`);
 		proposals.value = res.data;
+		// 将原数组拆分成以stat值相同的数组
+		const result = res.data.reduce((acc, cur) => {
+			let found = false;
+			// 遍历之前的数组，查找当前元素所属的数组
+			for (let i = 0; i < acc.length; i++) {
+				if (cur.stat === acc[i][0].stat) {
+					acc[i].push(cur);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				// 若未找到，则新建一个数组
+				acc.push([cur]);
+			}
+			return acc;
+		}, []);
+		// 合并所有的数组
+		const result2 = result.reduce((acc, cur) => {
+			return (proposals.value = acc.concat(cur));
+		}, []);
 		loading.value = false;
 		const { start_at, block_delay_secs } = store.state.headInfo;
 		getDate1.value = getTimestamp(start_at, block_delay_secs, res.data[0].details.new_beneficiary_release_height);
