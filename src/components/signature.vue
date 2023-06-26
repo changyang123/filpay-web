@@ -3,7 +3,7 @@
 		<div class="dialogInfo" v-loading="loading">
 			<div>
 				<div class="modify">
-					<p>{{ props.dialogName == "修改质押人地址" ? "质押人地址" : props.dialogName == "修改收益人地址" ? "收益人地址" : "钱包地址" }}</p>
+					<p>{{ props.dialogName == "修改质押人地址" ? "现质押人地址" : props.dialogName == "修改收益人地址" ? "现收益人地址" : "钱包地址" }}</p>
 					<el-input v-model="addr" placeholder="请输入钱包地址" onkeyup="value=value.replace(/\s+/g, '')" style="width: 400px"> </el-input>
 				</div>
 				<div class="modify">
@@ -24,6 +24,10 @@
 					></el-input>
 				</div>
 				<div class="tips" v-if="currencyActive != 0"><img src="../assets/w.png" />您也可以一次粘贴助记词</div>
+			</div>
+			<div class="line modify" v-if="props.dialogName == '修改质押人地址' || props.dialogName == '修改收益人地址'">
+				<p class="mar_30">{{ props.dialogName == "修改质押人地址" ? "新质押人地址" : props.dialogName == "修改收益人地址" ? "新收益人地址" : "钱包地址" }}</p>
+				<el-input class="mar_30" v-model="addr" placeholder="请输入钱包地址" onkeyup="value=value.replace(/\s+/g, '')" style="width: 400px"> </el-input>
 			</div>
 			<div class="modify" style="margin-top: 30px">
 				<el-button class="primary" @click="submit" style="margin-left: 137px">提交</el-button>
@@ -437,5 +441,13 @@ const chooseCurrency = (i) => {
 			}
 		}
 	}
+}
+</style>
+<style scoped>
+.mar_30 {
+	margin-top: 30px;
+}
+.line {
+	border-top: 2px solid #c9c7c7;
 }
 </style>
