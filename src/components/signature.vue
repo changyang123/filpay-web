@@ -27,7 +27,7 @@
 			</div>
 			<div class="line modify" v-if="props.dialogName == '修改质押人地址' || props.dialogName == '修改收益人地址'">
 				<p class="mar_30">{{ props.dialogName == "修改质押人地址" ? "新质押人地址" : props.dialogName == "修改收益人地址" ? "新收益人地址" : "钱包地址" }}</p>
-				<el-input class="mar_30" v-model="addr" placeholder="请输入钱包地址" onkeyup="value=value.replace(/\s+/g, '')" style="width: 400px"> </el-input>
+				<el-input class="mar_30" v-model="new_addr" placeholder="请输入钱包地址" onkeyup="value=value.replace(/\s+/g, '')" style="width: 400px"> </el-input>
 			</div>
 			<div class="modify" style="margin-top: 30px">
 				<el-button class="primary" @click="submit" style="margin-left: 137px">提交</el-button>
@@ -51,6 +51,7 @@ const Route = useRoute();
 const router = useRouter();
 const store = useStore();
 const addr = ref("");
+const new_addr = ref("");
 // f1ll5sbovf56rg3ba3keshbis7zahn3yurc3uj45y
 const addrs = ref([]);
 const num = ref(0);
@@ -220,7 +221,7 @@ const submit = async () => {
 	} else if (props.dialogName == "修改质押人地址") {
 		loading.value = false;
 		const isAdd = props.parentForm.addArr.filter((info) => {
-			return addr.value == info.addr;
+			return new_addr.value == info.addr;
 		});
 		if (isAdd.length > 0) {
 			ElMessage.warning("质押人信息列表钱包地址有重复，请重新输入");
@@ -232,13 +233,13 @@ const submit = async () => {
 			miner_id: Route.query.id,
 			msg_type: "changeInvestor",
 			params: {
-				new_addr: addr.value,
+				new_addr: new_addr.value,
 			},
 		});
 	} else if (props.dialogName == "修改收益人地址") {
 		loading.value = false;
 		const isAdd = props.parentForm.addArr.filter((info) => {
-			return addr.value == info.addr;
+			return new_addr.value == info.addr;
 		});
 		if (isAdd.length > 0) {
 			ElMessage.warning("收益人信息列表钱包地址有重复，请重新输入");
@@ -250,7 +251,7 @@ const submit = async () => {
 			miner_id: Route.query.id,
 			msg_type: "changeBeneficiary",
 			params: {
-				new_addr: addr.value,
+				new_addr: new_addr.value,
 			},
 		});
 	}
