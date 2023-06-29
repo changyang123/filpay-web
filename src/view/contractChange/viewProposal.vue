@@ -11,13 +11,13 @@
 					<div class="name">{{ proposalName(item) }}</div>
 				</div>
 			</div>
-			<div class="btn" :class="item.stat == -1 || item.stat == 2 ? 'underway' : item.stat == 0 ? 'primary' : item.stat == 1 ? 'success' : 'error'">{{ proposalStatus(item) }}</div>
+			<div class="btn" :class="item.stat == -1 ? 'underway' : item.stat == 0 ? 'primary' : item.stat == 1 ? 'success' : 'error'">{{ proposalStatus(item) }}</div>
 		</div>
 	</div>
 	<div class="container" v-show="isshow">
 		<div class="formInfo">
 			<div class="title">{{ proposalName(details) }}</div>
-			<div class="btn" :class="details.stat == -1 || details.stat == 2 ? 'underway' : details.stat == 0 ? 'primary' : details.stat == 1 ? 'success' : 'error'">
+			<div class="btn" :class="details.stat == -1 ? 'underway' : details.stat == 0 ? 'primary' : details.stat == 1 ? 'success' : 'error'">
 				{{ proposalStatus(details) }}
 			</div>
 			<div class="item" v-if="details.proposal_type == 1">
@@ -84,6 +84,7 @@ const isshow = ref(false);
 const visible = ref(false);
 const loading = ref(false);
 const getDate1 = ref("");
+const getDate = ref("");
 const form = reactive({
 	approved: false,
 	activeIndex: 0,
@@ -108,7 +109,7 @@ const proposalName = (item) => {
 		: "更新质押池总额";
 };
 const proposalStatus = (item) => {
-	return item.stat == -1 || item.stat == 2 ? "未通过" : item.stat == 0 ? "进行中" : item.stat == 1 ? "通过" : "执行失败";
+	return item.stat == -1 ? "未通过" : item.stat == 0 ? "进行中" : item.stat == 1 ? "通过" : "执行失败";
 };
 const submit = async () => {
 	if (active.value == null) {
@@ -125,30 +126,30 @@ const proposalsFun = async () => {
 	try {
 		const res = await get(`${sessionStorage.getItem("network")}/${Route.query.id}/proposals`);
 		proposals.value = res.data;
-		// 将原数组拆分成以stat值相同的数组
-		const result = res.data.reduce((acc, cur) => {
-			let found = false;
-			// 遍历之前的数组，查找当前元素所属的数组
-			for (let i = 0; i < acc.length; i++) {
-				if (cur.stat === acc[i][0].stat) {
-					acc[i].push(cur);
-					found = true;
+		for (const obj of proposals.value) {
+			for (const item of obj.vote_stat) {
+				if (item.stat === 2) {
+					obj.stat = -1;
 					break;
 				}
 			}
-			if (!found) {
-				// 若未找到，则新建一个数组
-				acc.push([cur]);
-			}
-			return acc;
-		}, []);
-		// 合并所有的数组
-		const result2 = result.reduce((acc, cur) => {
-			return (proposals.value = acc.concat(cur));
-		}, []);
+		}
+
+		// 指定排序顺序
+		const sortOrder = [0, 1, -1];
+
+		// 自定义比较函数
+		function customSort(a, b) {
+			const indexA = sortOrder.indexOf(a.stat);
+			const indexB = sortOrder.indexOf(b.stat);
+
+			return indexA - indexB;
+		}
+
+		// 按照指定顺序进行排序
+		proposals.value.sort(customSort);
+
 		loading.value = false;
-		const { start_at, block_delay_secs } = store.state.headInfo;
-		getDate1.value = getTimestamp(start_at, block_delay_secs, res.data[0].details.new_beneficiary_release_height);
 	} catch (error) {
 		if (error == 404) {
 			ElMessage.warning("暂无提案");
@@ -160,6 +161,12 @@ const openInfo = (item, i) => {
 	form.activeIndex = i;
 	details.value = item;
 	isshow.value = true;
+	const { start_at, block_delay_secs } = store.state.headInfo;
+	if (item.proposal_type == 2) {
+		getDate1.value = getTimestamp(start_at, block_delay_secs, item.details.new_beneficiary_release_height);
+	} else if (item.proposal_type == 3) {
+		getDate1.value = getTimestamp(start_at, block_delay_secs, item.details.new_invested_release_height);
+	}
 };
 </script>
 <style lang="less" scoped>
